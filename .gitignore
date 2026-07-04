@@ -1,0 +1,50 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+**/node_modules
+dist
+dist-ssr
+*.local
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+**/.env
+!**/.env.example
+
+# Local key/secret stash (deploy wallet, retired configs)
+.keys/
+
+# Solana / Anchor build artifacts
+.anchor
+target
+test-ledger
+**/*.rs.bk
+programs/**/target
+keypairs
+*.keypair.json
+wallet.json
+devnet-wallet.json
+**/devnet-wallet.json
+
+# Test / coverage
+coverage
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
