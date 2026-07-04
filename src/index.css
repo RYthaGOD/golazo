@@ -206,6 +206,51 @@ button:disabled {
   background: var(--bg-soft);
 }
 
+.hint-bar {
+  padding: 12px 16px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  background: rgba(255, 255, 255, 0.5);
+}
+.hint-bar strong {
+  color: var(--accent-current);
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+
+/* Login screen extras */
+.login-art {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.login-art img {
+  width: 72px;
+  height: 96px;
+  object-fit: cover;
+  object-position: center 20%;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+}
+.login-steps {
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.9;
+  padding-left: 20px;
+}
+.login-steps strong {
+  color: var(--text-main);
+}
+
+a {
+  color: var(--accent-current);
+}
+
 .error-note {
   padding: 12px 16px;
   border: 1px solid #e11d48;
@@ -578,6 +623,62 @@ button.player-card:not(:disabled):hover {
   background: rgba(225, 29, 72, 0.08);
   color: #e11d48;
   border: 1px solid #e11d48;
+}
+
+/* ── Live match center ──────────────────────────────────────── */
+.live-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.live-row {
+  display: grid;
+  grid-template-columns: 64px 1fr auto 1fr 110px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+}
+.live-row.is-live {
+  border-color: var(--accent-current);
+  box-shadow: 0 0 14px rgba(21, 128, 61, 0.18);
+}
+.live-status {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-align: center;
+  border-radius: 6px;
+  padding: 4px 0;
+}
+.live-status.live-ft { color: var(--text-muted); background: var(--bg-soft); }
+.live-status.live-live { color: #fff; background: var(--accent-current); }
+.live-status.live-upcoming { color: var(--accent-gold); background: rgba(202, 138, 4, 0.12); }
+.live-team { font-weight: 600; }
+.live-team.home { text-align: right; }
+.live-score {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 17px;
+  min-width: 56px;
+  text-align: center;
+}
+.live-kickoff {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .live-row {
+    grid-template-columns: 52px 1fr auto 1fr;
+  }
+  .live-kickoff {
+    display: none;
+  }
 }
 
 @media (max-width: 900px) {

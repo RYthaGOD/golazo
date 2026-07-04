@@ -2,7 +2,9 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# The lockfile is written by npm 11; align the builder to avoid optional-dep
+# resolution drift between npm majors (utf-8-validate/bufferutil under ws).
+RUN npm install -g npm@11 && npm ci --no-audit --no-fund
 COPY . .
 
 # Public build-time config (embedded in the client bundle — not secret).
@@ -10,9 +12,11 @@ COPY . .
 ARG VITE_SOLANA_CLUSTER=devnet
 ARG VITE_PACK_PROGRAM_ID=GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL
 ARG VITE_SOLANA_RPC_URL=
+ARG VITE_DATA_API_URL=
 ENV VITE_SOLANA_CLUSTER=$VITE_SOLANA_CLUSTER \
     VITE_PACK_PROGRAM_ID=$VITE_PACK_PROGRAM_ID \
-    VITE_SOLANA_RPC_URL=$VITE_SOLANA_RPC_URL
+    VITE_SOLANA_RPC_URL=$VITE_SOLANA_RPC_URL \
+    VITE_DATA_API_URL=$VITE_DATA_API_URL
 RUN npm run build
 
 # ---- Serve the static build ----

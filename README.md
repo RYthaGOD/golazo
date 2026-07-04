@@ -1,13 +1,19 @@
 # Golazo
 
 A World Cup trading-card game on Solana devnet. Buy card packs with devnet
-SOL, collect players rated from their real 2022 World Cup statistics, and
-play five-a-side simulated matches against AI squads.
+SOL, collect players rated from their real 2022 World Cup statistics, play
+five-a-side simulated matches against AI squads, and follow World Cup 2026
+scores fed exclusively by **TxODDS TxLINE**.
 
-There is no game server and no database. Each pack purchase is a transaction:
-the program takes the pack price and stores a random 32-byte seed in a
-per-pack account. The client derives the pack's five cards from that seed, so
-a wallet's whole collection is reconstructed from its on-chain accounts alone.
+**Play it: https://golazo-web-production.up.railway.app** (devnet wallet +
+free airdrop button in-app).
+
+There is no game database. Each pack purchase is a transaction: the program
+takes the pack price and stores a random 32-byte seed in a per-pack account.
+The client derives the pack's five cards from that seed, so a wallet's whole
+collection is reconstructed from its on-chain accounts alone. The only
+backend is a thin stateless proxy that relays TxODDS match data (its
+credentials are wallet-gated secrets that cannot live in the browser).
 
 <img src="public/cards/fwd.webp" width="220" align="right" alt="Anime-style card art: a striker hitting a bicycle kick">
 
@@ -24,6 +30,9 @@ a wallet's whole collection is reconstructed from its on-chain accounts alone.
 - **Matches** — simulated minute by minute with a text commentary log;
   draws are settled on penalties. Results are deterministic for a given
   pair of squads and seed. Three AI difficulty tiers.
+- **Match center** — the LIVE tab shows World Cup 2026 fixtures (teams,
+  scores, match clocks) read from the TxODDS TxLINE feed — the app's sole
+  source of match data.
 
 The card artwork is original anime-style illustration (one archetype per
 position) — no player likenesses are used; only factual names and statistics
@@ -44,14 +53,28 @@ Without a `.env` (or with `VITE_PACK_PROGRAM_ID` left blank) the app runs in
 **free play**: packs open locally with random seeds and no SOL is needed.
 The header shows which mode is active.
 
-## On-chain deployment
+## Live deployment
 
 | | |
 | --- | --- |
+| Frontend | https://golazo-web-production.up.railway.app |
+| Data service (TxODDS proxy) | https://golazo-data-production.up.railway.app/api/health |
 | Program | [`GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL`](https://explorer.solana.com/address/GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL?cluster=devnet) |
 | Cluster | devnet (upgradeable) |
 | Config PDA | `2UJ7aFBPr3NL7WtHwpMnFGkNbn9vfYG6zKxGueGhMDtB` |
 | Pack price | 0.05 SOL |
+
+## Match data: TxODDS TxLINE
+
+All match data — teams, scores, clocks — comes exclusively from
+[TxODDS](https://www.txodds.com) **TxLINE**, whose access is itself
+Solana-native: a wallet subscribes on-chain to a service tier, then activates
+an API token and a short-lived guest JWT. [server/index.mjs](server/index.mjs)
+is a zero-dependency proxy that holds those credentials, discovers the
+fixtures the subscription covers, and serves them to the frontend
+(`/api/live`), caching results and never letting a throttled upstream read
+shrink the scoreboard. The current session covers 17 World Cup 2026 group
+fixtures at the free tier (~60s delay).
 
 ### Instructions
 
@@ -70,9 +93,10 @@ Anchor discriminators and account layouts (see
 
 ```
 src/game/          card database, pack derivation, match simulator, storage (+ tests)
-src/solana/        program client and the usePacks hook
-src/components/    shop, collection, squad builder, arena
+src/solana/        program client, usePacks/useBalance hooks
+src/components/    shop, collection, squad builder, arena, match center
 programs/golazo/   Anchor program (Rust)
+server/            TxODDS TxLINE proxy (zero-dependency Node)
 scripts/           one-time config initialization
 tests/             Anchor integration tests
 ```
@@ -114,12 +138,17 @@ After a redeploy the program id must be updated in four places:
 [.env.example](.env.example), and the `ARG` default in the
 [Dockerfile](Dockerfile) (Docker builds do not read `.env`).
 
-## Frontend deployment
+## Hosting
 
-Static Vite build. The root [Dockerfile](Dockerfile) is a multi-stage build
-that serves `dist/` (Railway-ready); [vercel.json](vercel.json) covers Vercel.
-Public configuration is passed as build args (`VITE_SOLANA_CLUSTER`,
-`VITE_PACK_PROGRAM_ID`, `VITE_SOLANA_RPC_URL`).
+Two Railway services:
+
+- **golazo-web** — static Vite build via the root [Dockerfile](Dockerfile);
+  public config is passed as build args (`VITE_SOLANA_CLUSTER`,
+  `VITE_PACK_PROGRAM_ID`, `VITE_SOLANA_RPC_URL`, `VITE_DATA_API_URL`).
+  [vercel.json](vercel.json) covers Vercel as an alternative.
+- **golazo-data** — [server/Dockerfile](server/Dockerfile); configured with
+  `TXLINE_JWT`, `TXLINE_API_TOKEN` (or a single `TXLINE_SESSION_JSON`),
+  `TXLINE_FIXTURE_RANGE`, and `CORS_ORIGIN` scoped to the frontend origin.
 
 ## Design notes and limitations
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Swords, Trophy, FastForward } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -21,6 +21,7 @@ export default function BattleArena({ squadApi }) {
   const [revealed, setRevealed] = useState(0);
   const [record, setRecord] = useState(() => readWalletJson('record', pubkey, NO_RECORD, isWinLossRecord));
   const recordedRef = useRef(false);
+  const logRef = useRef(null);
 
   // Wallet switches mid-session must swap in that wallet's own record —
   // otherwise the next result writes the old wallet's numbers under the new key.
@@ -30,6 +31,12 @@ export default function BattleArena({ squadApi }) {
 
   const fullLog = battle?.result.log ?? [];
   const done = battle && revealed >= fullLog.length;
+
+  // Follow the commentary as it lands.
+  useLayoutEffect(() => {
+    const el = logRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [revealed]);
 
   useEffect(() => {
     if (!battle || done) return undefined;
@@ -118,7 +125,7 @@ export default function BattleArena({ squadApi }) {
             )}
           </div>
 
-          <div className="glass-panel battle-log" role="log">
+          <div className="glass-panel battle-log" role="log" ref={logRef}>
             {visibleLog.map((entry, i) => (
               <motion.div
                 key={i}

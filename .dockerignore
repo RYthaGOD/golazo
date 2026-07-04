@@ -3,6 +3,7 @@ node_modules
 dist
 target
 programs
+server
 tests
 .git
 .github

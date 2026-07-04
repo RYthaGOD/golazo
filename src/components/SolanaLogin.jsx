@@ -33,11 +33,24 @@ export default function SolanaLogin() {
           Golazo
         </h1>
         <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '15px' }}>
-          The World Cup player trading-card game. Open packs, collect cards rated
-          from real World Cup stats, and battle 5v5 in simulated fantasy matches.
+          The World Cup player trading-card game on Solana devnet. Open packs,
+          collect cards rated from real World Cup stats, and battle 5v5.
         </p>
 
-        <div style={{ marginTop: '20px' }}>
+        <div className="login-art" aria-hidden="true">
+          <img src="/cards/gk.webp" alt="" loading="lazy" />
+          <img src="/cards/def.webp" alt="" loading="lazy" />
+          <img src="/cards/mid.webp" alt="" loading="lazy" />
+          <img src="/cards/fwd.webp" alt="" loading="lazy" />
+        </div>
+
+        <ol className="login-steps">
+          <li>Connect a wallet set to <strong>devnet</strong></li>
+          <li>Grab free devnet SOL with the in-app airdrop</li>
+          <li>Open packs, build your five, hit the arena</li>
+        </ol>
+
+        <div style={{ marginTop: '8px' }}>
           <WalletMultiButton style={{
             backgroundColor: 'var(--accent-current)',
             border: '1px solid var(--accent-current)',

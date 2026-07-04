@@ -31,6 +31,8 @@ vi.mock('./config.js', () => ({
   SOLANA_RPC_URL: 'http://127.0.0.1:8899',
   PACK_PROGRAM_ID: '',
   HAS_PACK_PROGRAM: false,
+  DATA_API_URL: '',
+  HAS_DATA_API: false,
 }));
 
 // framer-motion's rAF loops run away under jsdom (heap exhaustion) — render

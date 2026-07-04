@@ -18,3 +18,9 @@ export const PACK_PROGRAM_ID = (import.meta.env.VITE_PACK_PROGRAM_ID || '').trim
 
 /** True when pack purchases go through the on-chain program. */
 export const HAS_PACK_PROGRAM = PACK_PROGRAM_ID.length > 0;
+
+/** Golazo data service base URL (TxODDS TxLINE proxy). Empty => LIVE tab hidden. */
+export const DATA_API_URL = (import.meta.env.VITE_DATA_API_URL || '').trim().replace(/\/$/, '');
+
+/** True when the TxODDS match center is available. */
+export const HAS_DATA_API = DATA_API_URL.length > 0;

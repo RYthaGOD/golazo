@@ -1,12 +1,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Package, Sparkles } from 'lucide-react';
+import { Package, Sparkles, Droplets } from 'lucide-react';
 import PlayerCard from './PlayerCard.jsx';
 import { SLOT_ODDS, FINAL_SLOT_ODDS } from '../game/packs.js';
 
+// Rough headroom for the tx fee + pack/player account rent on top of the price.
+const FEE_HEADROOM_SOL = 0.01;
+
 /** Buy packs (devnet SOL or free play) and watch the 5-card reveal. */
-export default function PackShop({ packsApi }) {
+export default function PackShop({ packsApi, balanceApi }) {
   const { onChain, packs, packPriceSol, buying, error, buyPack, lastOpened, clearLastOpened } = packsApi;
+
+  const needsSol =
+    onChain &&
+    balanceApi?.sol != null &&
+    packPriceSol != null &&
+    balanceApi.sol < packPriceSol + FEE_HEADROOM_SOL;
+
+  const handleBuy = async () => {
+    await buyPack();
+    balanceApi?.refresh();
+  };
 
   if (lastOpened) {
     const bestOverall = Math.max(...lastOpened.map((c) => c.overall));
@@ -74,20 +88,37 @@ export default function PackShop({ packsApi }) {
             </tbody>
           </table>
 
-          <button
-            className="glow-border"
-            style={{ padding: '14px 28px', fontSize: 15, alignSelf: 'flex-start' }}
-            onClick={buyPack}
-            disabled={buying}
-          >
-            {buying
-              ? onChain
-                ? 'CONFIRMING ON DEVNET…'
-                : 'OPENING…'
-              : onChain
-                ? `BUY PACK · ${packPriceSol != null ? `${packPriceSol} SOL` : '… SOL'}`
-                : 'OPEN FREE PACK'}
-          </button>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              className="glow-border"
+              style={{ padding: '14px 28px', fontSize: 15 }}
+              onClick={handleBuy}
+              disabled={buying || needsSol}
+            >
+              {buying
+                ? onChain
+                  ? 'CONFIRMING ON DEVNET…'
+                  : 'OPENING…'
+                : onChain
+                  ? `BUY PACK · ${packPriceSol != null ? `${packPriceSol} SOL` : '… SOL'}`
+                  : 'OPEN FREE PACK'}
+            </button>
+
+            {onChain && balanceApi?.canAirdrop && (
+              <button onClick={balanceApi.requestAirdrop} disabled={balanceApi.airdropping} title="Request 1 devnet SOL from the faucet">
+                <Droplets size={14} style={{ verticalAlign: '-2px', marginRight: 6 }} />
+                {balanceApi.airdropping ? 'AIRDROPPING…' : 'AIRDROP 1 SOL'}
+              </button>
+            )}
+          </div>
+
+          {needsSol && (
+            <span style={{ fontSize: 13, color: 'var(--accent-gold)' }}>
+              You need about {(packPriceSol + FEE_HEADROOM_SOL).toFixed(2)} devnet SOL for a pack — use the
+              airdrop button or{' '}
+              <a href="https://faucet.solana.com" target="_blank" rel="noreferrer">faucet.solana.com</a>.
+            </span>
+          )}
 
           <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
             PACKS IN YOUR CLUB: {packs.length}
@@ -95,9 +126,16 @@ export default function PackShop({ packsApi }) {
         </div>
       </div>
 
-      {error && (
+      {packs.length === 0 && !error && (
+        <div className="hint-bar">
+          New here? Open a pack, check your club in <strong>CLUB</strong>, pick your five in{' '}
+          <strong>SQUAD</strong>, then take them to the <strong>ARENA</strong>.
+        </div>
+      )}
+
+      {(error || balanceApi?.airdropError) && (
         <div role="alert" className="error-note">
-          {error}
+          {error || balanceApi.airdropError}
         </div>
       )}
     </div>
