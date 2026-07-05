@@ -1,4 +1,5 @@
 import React from 'react';
+import { CARD_ART } from '../game/cardArt.js';
 
 const STAT_LABELS = [
   ['att', 'ATT'],
@@ -8,14 +9,21 @@ const STAT_LABELS = [
 ];
 
 /**
- * Position-archetype card art: original anime characters (no player likeness).
- * Cards stay text-factual (name, nation, stats); the art is fictional.
+ * Card art: a per-player image when one exists (public/cards/players/, tracked
+ * by the CARD_ART manifest), else the shared position archetype. Either way
+ * the art is an original anime character — no real player likeness; only the
+ * name, nation, and stats are factual.
  */
 const POSITION_ART = {
   GK: '/cards/gk.webp',
   DEF: '/cards/def.webp',
   MID: '/cards/mid.webp',
   FWD: '/cards/fwd.webp',
+};
+
+const artFor = (card) => {
+  const file = CARD_ART.get(card.id);
+  return file ? `/cards/players/${file}` : POSITION_ART[card.pos];
 };
 
 // The WC line depends on the edition: WC26 cards are rated from tournament
@@ -47,7 +55,19 @@ export default function PlayerCard({ card, count = 1, onClick, selected = false,
       </div>
       {!compact && (
         <div className="pc-art">
-          <img src={POSITION_ART[card.pos]} alt="" loading="lazy" />
+          <img
+            src={artFor(card)}
+            alt=""
+            loading="lazy"
+            onError={(e) => {
+              // Manifest lists it but the file 404s → fall back to archetype.
+              const t = e.currentTarget;
+              if (!t.dataset.fallback) {
+                t.dataset.fallback = '1';
+                t.src = POSITION_ART[card.pos];
+              }
+            }}
+          />
         </div>
       )}
       <div className="pc-name">{card.name}</div>

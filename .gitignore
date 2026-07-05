@@ -38,6 +38,9 @@ devnet-wallet.json
 # Test / coverage
 coverage
 
+# Generated image-prompt list (regenerate with scripts/gen-card-prompts.mjs)
+card-prompts.jsonl
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
