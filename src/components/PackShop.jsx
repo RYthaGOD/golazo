@@ -8,7 +8,7 @@ import { SLOT_ODDS, FINAL_SLOT_ODDS } from '../game/packs.js';
 const FEE_HEADROOM_SOL = 0.01;
 
 /** Buy packs (devnet SOL or free play) and watch the 5-card reveal. */
-export default function PackShop({ packsApi, balanceApi }) {
+export default function PackShop({ packsApi, balanceApi, edition }) {
   const { onChain, packs, packPriceSol, buying, error, buyPack, lastOpened, clearLastOpened } = packsApi;
 
   const needsSol =
@@ -59,13 +59,13 @@ export default function PackShop({ packsApi, balanceApi }) {
         <div className="pack-visual" aria-hidden="true">
           <span className="pack-ball">⚽</span>
           <span className="pack-brand">GOLAZO</span>
-          <span className="pack-edition">WORLD CUP 22 EDITION</span>
+          <span className="pack-edition">{edition.label.toUpperCase()}</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 220, flex: 1 }}>
           <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, fontSize: 14 }}>
-            5 player cards per pack, rated from real World Cup 2022 stats. The final slot is always
-            <strong> RARE or better</strong>.
+            5 player cards per pack from the <strong>{edition.label}</strong> set ({edition.tagline}). The final
+            slot is always <strong>RARE or better</strong>.
             {onChain
               ? ' Each purchase commits a seed on Solana devnet — your collection lives on-chain.'
               : ' Free-play mode: packs are stored locally, no SOL needed.'}

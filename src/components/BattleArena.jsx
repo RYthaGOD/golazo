@@ -11,23 +11,24 @@ const REVEAL_MS = 1000;
 const NO_RECORD = { w: 0, l: 0 };
 
 /** 5v5 simulated battles vs seeded AI squads, with animated play-by-play. */
-export default function BattleArena({ squadApi }) {
+export default function BattleArena({ squadApi, edition }) {
   const { publicKey } = useWallet();
   const { squad, isLegal } = squadApi;
   const pubkey = publicKey?.toBase58() ?? null;
+  const recordNs = `record:${edition.id}`;
 
   const [tier, setTier] = useState('amateur');
   const [battle, setBattle] = useState(null); // { result, aiSquad, tierLabel }
   const [revealed, setRevealed] = useState(0);
-  const [record, setRecord] = useState(() => readWalletJson('record', pubkey, NO_RECORD, isWinLossRecord));
+  const [record, setRecord] = useState(() => readWalletJson(recordNs, pubkey, NO_RECORD, isWinLossRecord));
   const recordedRef = useRef(false);
   const logRef = useRef(null);
 
-  // Wallet switches mid-session must swap in that wallet's own record —
-  // otherwise the next result writes the old wallet's numbers under the new key.
+  // Wallet or edition switches must swap in that record — otherwise the next
+  // result writes the previous record's numbers under the new key.
   useEffect(() => {
-    setRecord(readWalletJson('record', pubkey, NO_RECORD, isWinLossRecord));
-  }, [pubkey]);
+    setRecord(readWalletJson(recordNs, pubkey, NO_RECORD, isWinLossRecord));
+  }, [pubkey, recordNs]);
 
   const fullLog = battle?.result.log ?? [];
   const done = battle && revealed >= fullLog.length;
@@ -49,12 +50,12 @@ export default function BattleArena({ squadApi }) {
     recordedRef.current = true;
     const key = battle.result.winner === 'home' ? 'w' : 'l';
     const next = { ...record, [key]: record[key] + 1 };
-    writeWalletJson('record', pubkey, next);
+    writeWalletJson(recordNs, pubkey, next);
     setRecord(next);
-  }, [done, battle, record, pubkey]);
+  }, [done, battle, record, pubkey, recordNs]);
 
   const fight = () => {
-    const aiSquad = buildAiSquad(tier, randomSeed());
+    const aiSquad = buildAiSquad(tier, randomSeed(), edition.players);
     const result = simulateBattle(squad, aiSquad, randomSeed(), {
       home: 'YOUR FIVE',
       away: AI_TIERS[tier].label.toUpperCase(),

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Users } from 'lucide-react';
 import PlayerCard from './PlayerCard.jsx';
-import { PLAYERS, POSITIONS, RARITIES } from '../game/players.js';
+import { POSITIONS, RARITIES } from '../game/players.js';
 
 /**
  * The wallet's card collection with position/rarity filters.
  * When `onToggle` is provided (squad building) cards become selectable.
  */
-export default function CollectionGrid({ collection, selectedIds, onToggle, title = 'MY CLUB' }) {
+export default function CollectionGrid({ collection, selectedIds, onToggle, edition, title = 'MY CLUB' }) {
+  const totalCards = edition?.players.length ?? collection.length;
   const [posFilter, setPosFilter] = useState('ALL');
   const [rarityFilter, setRarityFilter] = useState('ALL');
 
@@ -24,7 +25,7 @@ export default function CollectionGrid({ collection, selectedIds, onToggle, titl
           <Users size={18} /> {title}
         </h2>
         <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
-          {collection.length}/{PLAYERS.length} UNIQUE CARDS
+          {collection.length}/{totalCards} UNIQUE CARDS
         </span>
       </div>
 

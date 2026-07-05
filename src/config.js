@@ -13,11 +13,15 @@ export const SOLANA_CLUSTER = VALID_CLUSTERS.includes(rawCluster) ? rawCluster :
 export const SOLANA_RPC_URL =
   import.meta.env.VITE_SOLANA_RPC_URL?.trim() || clusterApiUrl(SOLANA_CLUSTER);
 
-/** Deployed golazo pack program id. Empty => free-play mode (local packs). */
-export const PACK_PROGRAM_ID = (import.meta.env.VITE_PACK_PROGRAM_ID || '').trim();
+/** Deployed golazo pack program ids, one per edition. Empty => free play. */
+export const PACK_PROGRAM_ID_2022 = (import.meta.env.VITE_PACK_PROGRAM_ID || '').trim();
+export const PACK_PROGRAM_ID_2026 = (import.meta.env.VITE_PACK_PROGRAM_ID_2026 || '').trim();
 
-/** True when pack purchases go through the on-chain program. */
-export const HAS_PACK_PROGRAM = PACK_PROGRAM_ID.length > 0;
+/** Back-compat alias (WC22 was the original single edition). */
+export const PACK_PROGRAM_ID = PACK_PROGRAM_ID_2022;
+
+/** True when the WC22 edition's purchases go through the on-chain program. */
+export const HAS_PACK_PROGRAM = PACK_PROGRAM_ID_2022.length > 0;
 
 /** Golazo data service base URL (TxODDS TxLINE proxy). Empty => LIVE tab hidden. */
 export const DATA_API_URL = (import.meta.env.VITE_DATA_API_URL || '').trim().replace(/\/$/, '');

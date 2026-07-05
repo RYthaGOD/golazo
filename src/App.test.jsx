@@ -30,6 +30,8 @@ vi.mock('./config.js', () => ({
   SOLANA_CLUSTER: 'devnet',
   SOLANA_RPC_URL: 'http://127.0.0.1:8899',
   PACK_PROGRAM_ID: '',
+  PACK_PROGRAM_ID_2022: '',
+  PACK_PROGRAM_ID_2026: '',
   HAS_PACK_PROGRAM: false,
   DATA_API_URL: '',
   HAS_DATA_API: false,
@@ -84,21 +86,31 @@ const pickSquad = (cards) => {
   return [gk, def, fwd, ...rest];
 };
 
+// Everything is scoped to the WC22 edition here: it is the stable, hand-
+// authored set (the generated WC26 set changes when the feed is refreshed).
 beforeEach(() => {
   localStorage.clear();
-  localStorage.setItem(`golazo:packs:${TEST_PUBKEY}`, JSON.stringify(SEEDS));
+  localStorage.setItem(`golazo:packs:wc22:${TEST_PUBKEY}`, JSON.stringify(SEEDS));
 });
+
+// The app defaults to the WC26 edition; select WC22 so assertions match the
+// deterministic openPack() default pools.
+const selectWC22 = (user) => user.click(screen.getByRole('button', { name: /^WC22$/ }));
 
 describe('Golazo game loop', () => {
   it('shows the shop with pre-seeded packs counted', async () => {
+    const user = userEvent.setup();
     render(<App />);
-    expect(await screen.findByText('PACK SHOP')).toBeInTheDocument();
-    expect(screen.getByText(`PACKS IN YOUR CLUB: ${SEEDS.length}`)).toBeInTheDocument();
+    await screen.findByText('PACK SHOP');
+    await selectWC22(user);
+    expect(await screen.findByText(`PACKS IN YOUR CLUB: ${SEEDS.length}`)).toBeInTheDocument();
   });
 
   it('opens a free pack and adds it to the club', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByText('PACK SHOP');
+    await selectWC22(user);
     await user.click(await screen.findByRole('button', { name: /OPEN FREE PACK/i }));
     expect(await screen.findByText('PACK RIPPED OPEN')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /ADD TO MY CLUB/i }));
@@ -108,6 +120,8 @@ describe('Golazo game loop', () => {
   it('shows the owned collection in the club tab', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByText('PACK SHOP');
+    await selectWC22(user);
     await user.click(screen.getByRole('button', { name: /^CLUB$/i }));
     const owned = ownedCards();
     expect(await screen.findByText(new RegExp(`^${owned.length}/\\d+ UNIQUE CARDS$`))).toBeInTheDocument();
@@ -118,6 +132,8 @@ describe('Golazo game loop', () => {
   it('builds a legal squad and wins or loses a full arena battle', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByText('PACK SHOP');
+    await selectWC22(user);
 
     // Arena refuses play without a legal squad
     await user.click(screen.getByRole('button', { name: /^ARENA$/i }));
@@ -141,16 +157,18 @@ describe('Golazo game loop', () => {
     expect(await screen.findByText(/VICTORY!|DEFEAT\./)).toBeInTheDocument();
     expect(screen.getByText(/RECORD: (1W – 0L|0W – 1L)/)).toBeInTheDocument();
 
-    // The battle wrote the record to this wallet's storage
-    const record = JSON.parse(localStorage.getItem(`golazo:record:${TEST_PUBKEY}`));
+    // The battle wrote the record to this wallet's edition-scoped storage
+    const record = JSON.parse(localStorage.getItem(`golazo:record:wc22:${TEST_PUBKEY}`));
     expect(record.w + record.l).toBe(1);
   });
 
   it('remembers the saved squad across sessions (wallet reconnect)', async () => {
     const squad = pickSquad(ownedCards());
-    localStorage.setItem(`golazo:squad:${TEST_PUBKEY}`, JSON.stringify(squad.map((c) => c.id)));
+    localStorage.setItem(`golazo:squad:wc22:${TEST_PUBKEY}`, JSON.stringify(squad.map((c) => c.id)));
     const user = userEvent.setup();
     render(<App />);
+    await screen.findByText('PACK SHOP');
+    await selectWC22(user);
     // The tab's accessible name includes the "squad ready" dot's aria-label.
     await user.click(screen.getByRole('button', { name: /^SQUAD\b/i }));
     expect(await screen.findByText(/SQUAD READY/i)).toBeInTheDocument();

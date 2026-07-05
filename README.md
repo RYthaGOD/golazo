@@ -17,14 +17,25 @@ credentials are wallet-gated secrets that cannot live in the browser).
 
 <img src="public/cards/fwd.webp" width="220" align="right" alt="Anime-style card art: a striker hitting a bicycle kick">
 
+## Editions
+
+Two card sets, each an independent game (own cards, own on-chain program, own
+collection and squads), switchable in the header:
+
+- **World Cup 2026** — 696 players generated from the live TxODDS feed. Ratings
+  come from real squad, position, starter role, appearances, and each team's
+  goals for/against in the tournament so far. Re-run
+  [scripts/gen-wc26.mjs](scripts/gen-wc26.mjs) as the tournament progresses to
+  update the set.
+- **World Cup 2022** — 111 players hand-authored from the 2022 tournament's
+  final per-player lines.
+
 ## Gameplay
 
 - **Packs** — 5 cards each. The final slot is always RARE or better.
-- **Cards** — 111 players from the 2022 World Cup. The four ability stats
-  (ATT / PAS / DEF / PHY) are curated from each player's actual tournament;
-  the overall rating and rarity tier (COMMON / RARE / ELITE / LEGEND) are
-  computed from those stats, weighted by position. Every card face shows the
-  player's real tournament line (appearances · goals · assists).
+- **Cards** — the four ability stats (ATT / PAS / DEF / PHY) drive an overall
+  rating and rarity tier (COMMON / RARE / ELITE / LEGEND), computed weighted by
+  position. Every card face shows the player's real tournament line.
 - **Squads** — 5 cards: exactly 1 goalkeeper, at least 1 defender and
   1 forward.
 - **Matches** — simulated minute by minute with a text commentary log;
@@ -59,10 +70,13 @@ The header shows which mode is active.
 | --- | --- |
 | Frontend | https://golazo-web-production.up.railway.app |
 | Data service (TxODDS proxy) | https://golazo-data-production.up.railway.app/api/health |
-| Program | [`GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL`](https://explorer.solana.com/address/GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL?cluster=devnet) |
+| WC2022 program | [`GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL`](https://explorer.solana.com/address/GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL?cluster=devnet) |
+| WC2026 program | [`AY43PC3k3g1s8hBxZamVWubw35XDBBCHZBEg5ZeuLsJ2`](https://explorer.solana.com/address/AY43PC3k3g1s8hBxZamVWubw35XDBBCHZBEg5ZeuLsJ2?cluster=devnet) |
 | Cluster | devnet (upgradeable) |
-| Config PDA | `2UJ7aFBPr3NL7WtHwpMnFGkNbn9vfYG6zKxGueGhMDtB` |
-| Pack price | 0.05 SOL |
+| Pack price | 0.05 SOL (each edition) |
+
+Both editions run the same program bytecode under separate ids, so their
+packs, collections, and per-wallet counters never cross.
 
 ## Match data: TxODDS TxLINE
 
@@ -92,12 +106,13 @@ Anchor discriminators and account layouts (see
 ## Repository layout
 
 ```
-src/game/          card database, pack derivation, match simulator, storage (+ tests)
+src/game/          card sets (players.js, players2026.js), editions, pack
+                   derivation, match simulator, storage (+ tests)
 src/solana/        program client, usePacks/useBalance hooks
-src/components/    shop, collection, squad builder, arena, match center
+src/components/    shop, collection, squad builder, arena, match center, edition switcher
 programs/golazo/   Anchor program (Rust)
 server/            TxODDS TxLINE proxy (zero-dependency Node)
-scripts/           one-time config initialization
+scripts/           config init + WC26 card generator
 tests/             Anchor integration tests
 ```
 
@@ -115,28 +130,35 @@ CI runs lint, tests, and the production build on every push
 requires the Anchor CLI plus `ts-mocha`/`mocha`/`chai`, which are not part of
 this package.json.
 
-## Deploying the program yourself
+## Deploying a program yourself
 
-Build with the Solana toolchain; the Anchor CLI is optional.
+Build with the Solana toolchain; the Anchor CLI is optional. Each edition is a
+separate deployment of the same bytecode, so build it with that edition's id
+in `declare_id!`:
 
 ```bash
-cargo build-sbf
-solana-keygen pubkey target/deploy/golazo-keypair.json    # the program id
-# put that id in programs/golazo/src/lib.rs (declare_id!) and Anchor.toml, then:
+solana-keygen new -o target/deploy/edition-keypair.json      # the program id
+# set that id in programs/golazo/src/lib.rs (declare_id!), then:
 cargo build-sbf
 solana program deploy target/deploy/golazo.so \
-  --program-id target/deploy/golazo-keypair.json \
+  --program-id target/deploy/edition-keypair.json \
   --keypair <funded-devnet-wallet.json> --url devnet
 
 # Immediately afterwards (initialize is first-come-first-served):
 node scripts/init-config.mjs <PROGRAM_ID> 0.05 <funded-devnet-wallet.json>
 ```
 
-After a redeploy the program id must be updated in four places:
-`declare_id!` in [lib.rs](programs/golazo/src/lib.rs),
-[Anchor.toml](Anchor.toml), `VITE_PACK_PROGRAM_ID` in `.env` /
-[.env.example](.env.example), and the `ARG` default in the
+Restore `declare_id!` to the committed WC22 id afterwards. A redeployed id must
+also be updated in [Anchor.toml](Anchor.toml), the matching `VITE_PACK_PROGRAM_ID*`
+in `.env` / [.env.example](.env.example), and the `ARG` default in the
 [Dockerfile](Dockerfile) (Docker builds do not read `.env`).
+
+### Refreshing the WC26 card set
+
+```bash
+# with the TxLINE session reachable, cache the snapshots, then:
+node scripts/gen-wc26.mjs        # writes src/game/players2026.js
+```
 
 ## Hosting
 
@@ -144,17 +166,22 @@ Two Railway services:
 
 - **golazo-web** — static Vite build via the root [Dockerfile](Dockerfile);
   public config is passed as build args (`VITE_SOLANA_CLUSTER`,
-  `VITE_PACK_PROGRAM_ID`, `VITE_SOLANA_RPC_URL`, `VITE_DATA_API_URL`).
-  [vercel.json](vercel.json) covers Vercel as an alternative.
+  `VITE_PACK_PROGRAM_ID`, `VITE_PACK_PROGRAM_ID_2026`, `VITE_SOLANA_RPC_URL`,
+  `VITE_DATA_API_URL`). [vercel.json](vercel.json) covers Vercel as an alternative.
 - **golazo-data** — [server/Dockerfile](server/Dockerfile); configured with
   `TXLINE_JWT`, `TXLINE_API_TOKEN` (or a single `TXLINE_SESSION_JSON`),
   `TXLINE_FIXTURE_RANGE`, and `CORS_ORIGIN` scoped to the frontend origin.
 
 ## Design notes and limitations
 
-- **The card list is a frozen edition.** Pack contents are a function of
-  (seed × card database), so editing [players.js](src/game/players.js) would
-  re-derive every historical pack. New cards ship as a new edition.
+- **Each card set is a frozen edition.** Pack contents are a function of
+  (seed × card set), so editing a set re-derives every historical pack. A
+  refreshed set (e.g. WC26 later in the tournament) ships as a new edition and
+  deployment rather than an in-place edit.
+- **WC26 ratings are team-attributed.** Match snapshots don't retain
+  individual goal scorers, so attacking/defensive quality is derived from each
+  team's real results and shaped by the player's position and starter role —
+  not from individual goals.
 - **Seed randomness is devnet-grade.** The pack seed is
   `keccak(buyer, count, slot, timestamp)`, which is predictable enough that a
   production release would replace it with a VRF. The client would not change.

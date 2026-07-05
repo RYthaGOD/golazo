@@ -8,9 +8,11 @@ import CollectionGrid from './components/CollectionGrid.jsx';
 import SquadBuilder from './components/SquadBuilder.jsx';
 import BattleArena from './components/BattleArena.jsx';
 import LiveScores from './components/LiveScores.jsx';
+import EditionSwitcher from './components/EditionSwitcher.jsx';
 import { usePacks } from './solana/usePacks.js';
 import { useBalance } from './solana/useBalance.js';
 import { useSquad } from './game/useSquad.js';
+import { getEdition, DEFAULT_EDITION_ID } from './game/editions.js';
 import { SOLANA_CLUSTER, HAS_DATA_API } from './config.js';
 import './index.css';
 
@@ -25,11 +27,13 @@ const TABS = [
 function App() {
   const { connected } = useWallet();
   const [tab, setTab] = useState('shop');
+  const [editionId, setEditionId] = useState(DEFAULT_EDITION_ID);
+  const edition = getEdition(editionId);
 
-  const packsApi = usePacks();
+  const packsApi = usePacks(edition);
   const balanceApi = useBalance();
   const ownedIds = useMemo(() => new Set(packsApi.collection.map(({ card }) => card.id)), [packsApi.collection]);
-  const squadApi = useSquad(ownedIds);
+  const squadApi = useSquad(ownedIds, edition.id);
 
   if (!connected) {
     return <SolanaLogin />;
@@ -51,7 +55,7 @@ function App() {
             Golazo
           </h1>
           <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-sans)', marginTop: '4px', fontSize: 14 }}>
-            World Cup player TCG ·{' '}
+            {edition.label} ·{' '}
             <span style={{ color: 'var(--text-main)' }}>
               {packsApi.onChain ? `on-chain packs (${SOLANA_CLUSTER})` : 'free play'}
             </span>
@@ -59,6 +63,7 @@ function App() {
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <EditionSwitcher editionId={editionId} onChange={setEditionId} />
           <span className="pill">
             {packsApi.collection.length} CARDS · {packsApi.packs.length} PACKS
           </span>
@@ -99,10 +104,10 @@ function App() {
       )}
 
       <main style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        {tab === 'shop' && <PackShop packsApi={packsApi} balanceApi={balanceApi} />}
-        {tab === 'club' && <CollectionGrid collection={packsApi.collection} />}
+        {tab === 'shop' && <PackShop packsApi={packsApi} balanceApi={balanceApi} edition={edition} />}
+        {tab === 'club' && <CollectionGrid collection={packsApi.collection} edition={edition} />}
         {tab === 'squad' && <SquadBuilder collection={packsApi.collection} squadApi={squadApi} />}
-        {tab === 'arena' && <BattleArena squadApi={squadApi} />}
+        {tab === 'arena' && <BattleArena squadApi={squadApi} edition={edition} />}
         {tab === 'live' && <LiveScores />}
       </main>
     </div>

@@ -1,4 +1,11 @@
-import { PLAYERS_BY_RARITY } from './players.js';
+import { PLAYERS_BY_RARITY, RARITIES } from './players.js';
+
+/** Bucket a card list into rarity pools (the shape openPack draws from). */
+export function buildPools(players) {
+  const pools = Object.fromEntries(RARITIES.map((r) => [r, []]));
+  for (const card of players) pools[card.rarity].push(card);
+  return pools;
+}
 
 /**
  * Pack engine. A pack is fully determined by its seed: the on-chain program
@@ -79,16 +86,17 @@ function pickFrom(rng, pool) {
 
 /**
  * Derive the 5 cards of a pack from its seed. Deterministic: the same seed
- * always yields the same cards. Duplicates within a pack are re-rolled a few
- * times, then allowed (small pools can legitimately repeat).
+ * and card pools always yield the same cards. `pools` is a rarity→cards map
+ * (see buildPools); it defaults to the WC22 edition. Duplicates within a pack
+ * are re-rolled a few times, then allowed (small pools can legitimately repeat).
  */
-export function openPack(seed) {
+export function openPack(seed, pools = PLAYERS_BY_RARITY) {
   const rng = createRng(seed);
   const cards = [];
   for (let slot = 0; slot < PACK_SIZE; slot++) {
     const odds = slot === PACK_SIZE - 1 ? FINAL_SLOT_ODDS : SLOT_ODDS;
     const rarity = rollRarity(rng, odds);
-    const pool = PLAYERS_BY_RARITY[rarity];
+    const pool = pools[rarity];
     let card = pickFrom(rng, pool);
     for (let retry = 0; retry < 4 && cards.some((c) => c.id === card.id); retry++) {
       card = pickFrom(rng, pool);

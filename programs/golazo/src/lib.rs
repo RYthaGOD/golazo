@@ -21,6 +21,9 @@ use anchor_lang::solana_program::keccak;
 use anchor_lang::system_program;
 
 // Deployed devnet program id (keypair: target/deploy/golazo-keypair.json).
+// Two editions run the same bytecode under different ids: WC22 (this id) and
+// WC26 (AY43PC3k3g1s8hBxZamVWubw35XDBBCHZBEg5ZeuLsJ2). To deploy an edition,
+// temporarily set declare_id! to that edition's id, build, and deploy.
 declare_id!("GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL");
 
 #[program]

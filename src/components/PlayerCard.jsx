@@ -18,6 +18,13 @@ const POSITION_ART = {
   FWD: '/cards/fwd.webp',
 };
 
+// The WC line depends on the edition: WC26 cards are rated from tournament
+// appearances/starts, WC22 cards from final goals/assists.
+const wcLine = (card) =>
+  card.id.startsWith('wc26-')
+    ? `WC26 · ${card.wc.apps} ${card.wc.apps === 1 ? 'app' : 'apps'} · ${card.wc.starts ?? 0} starts`
+    : `WC22 · ${card.wc.apps} apps · ${card.wc.goals}G ${card.wc.assists}A`;
+
 /**
  * The Golazo card face. Rarity drives the frame via [data-rarity] CSS.
  * Renders as a <button> when clickable (squad picking), else a <div>.
@@ -54,9 +61,7 @@ export default function PlayerCard({ card, count = 1, onClick, selected = false,
               </div>
             ))}
           </div>
-          <div className="pc-wc">
-            WC22 · {card.wc.apps} apps · {card.wc.goals}G {card.wc.assists}A
-          </div>
+          <div className="pc-wc">{wcLine(card)}</div>
         </>
       )}
       <div className="pc-rarity">{card.rarity}</div>

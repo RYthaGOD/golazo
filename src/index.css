@@ -178,6 +178,29 @@ button:disabled {
   padding: 8px 16px;
 }
 
+.edition-switcher {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.6);
+}
+.edition-tab {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+.edition-tab.active {
+  background: var(--accent-current);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+}
+
 .section-title {
   display: flex;
   align-items: center;

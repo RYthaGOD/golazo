@@ -239,14 +239,15 @@ export const AI_TIERS = {
   world: { label: 'World Class', rarities: ['ELITE', 'LEGEND', 'RARE'] },
 };
 
-/** Draft a legal 5-card AI squad from a tier's rarity pools (seeded). */
-export function buildAiSquad(tier, seed) {
+/** Draft a legal 5-card AI squad from a tier's rarity pools (seeded).
+ *  `players` is the edition's card list (defaults to WC22). */
+export function buildAiSquad(tier, seed, players = PLAYERS) {
   const rng = createRng(seed);
   const { rarities } = AI_TIERS[tier] ?? AI_TIERS.amateur;
-  const pool = PLAYERS.filter((p) => rarities.includes(p.rarity));
+  const pool = players.filter((p) => rarities.includes(p.rarity));
   const draft = (pos, taken) => {
     const candidates = pool.filter((p) => p.pos === pos && !taken.has(p.id));
-    const fallback = PLAYERS.filter((p) => p.pos === pos && !taken.has(p.id));
+    const fallback = players.filter((p) => p.pos === pos && !taken.has(p.id));
     const from = candidates.length ? candidates : fallback;
     return from[Math.floor(rng() * from.length)];
   };

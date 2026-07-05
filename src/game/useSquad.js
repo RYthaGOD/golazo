@@ -4,18 +4,19 @@ import { PLAYER_BY_ID } from './players.js';
 import { validateSquad, SQUAD_SIZE } from './battle.js';
 import { readWalletJson, writeWalletJson, isStringArray } from './storage.js';
 
-/** The wallet's saved 5-card squad (card ids in localStorage). */
-export function useSquad(ownedIds) {
+/** The wallet's saved 5-card squad for an edition (card ids in localStorage). */
+export function useSquad(ownedIds, editionId) {
   const { publicKey } = useWallet();
   const pubkey = publicKey?.toBase58() ?? null;
+  const ns = `squad:${editionId}`;
 
-  const [ids, setIds] = useState(() => readWalletJson('squad', pubkey, [], isStringArray));
+  const [ids, setIds] = useState(() => readWalletJson(ns, pubkey, [], isStringArray));
 
   // The wallet connects after mount (pubkey: null → key) and can switch
-  // between wallets — reload that wallet's saved squad whenever it changes.
+  // between wallets/editions — reload that squad whenever the key changes.
   useEffect(() => {
-    setIds(readWalletJson('squad', pubkey, [], isStringArray));
-  }, [pubkey]);
+    setIds(readWalletJson(ns, pubkey, [], isStringArray));
+  }, [pubkey, ns]);
 
   // Cards can only be fielded if they are actually owned.
   const squadIds = useMemo(() => ids.filter((id) => ownedIds.has(id) && PLAYER_BY_ID.has(id)), [ids, ownedIds]);
@@ -34,17 +35,17 @@ export function useSquad(ownedIds) {
           : effective.length < SQUAD_SIZE
             ? [...effective, id]
             : effective;
-        writeWalletJson('squad', pubkey, next);
+        writeWalletJson(ns, pubkey, next);
         return next;
       });
     },
-    [pubkey, ownedIds],
+    [pubkey, ns, ownedIds],
   );
 
   const clear = useCallback(() => {
     setIds([]);
-    writeWalletJson('squad', pubkey, []);
-  }, [pubkey]);
+    writeWalletJson(ns, pubkey, []);
+  }, [pubkey, ns]);
 
   return { squad, squadIds, problems, isLegal: problems.length === 0 && squad.length === SQUAD_SIZE, toggle, clear };
 }
