@@ -588,6 +588,53 @@ button.player-card:not(:disabled):hover {
   color: var(--text-main);
 }
 
+.tape {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tape-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+}
+.tape-row > strong {
+  font-size: 15px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.tape-row > strong.lead {
+  color: var(--accent-current);
+}
+.tape-bar {
+  position: relative;
+  display: flex;
+  height: 16px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+.tape-home {
+  background: linear-gradient(90deg, var(--accent-pitch), #22c55e);
+}
+.tape-away {
+  background: linear-gradient(90deg, #f59e0b, #e11d48);
+}
+.tape-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-main);
+  mix-blend-mode: luminosity;
+}
+
 .battle-log {
   padding: 18px;
   display: flex;

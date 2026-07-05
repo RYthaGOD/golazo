@@ -126,6 +126,29 @@ export default function BattleArena({ squadApi, edition }) {
             )}
           </div>
 
+          <div className="glass-panel tape" aria-label="Tale of the tape">
+            {[
+              ['ATT', 'attack'],
+              ['MID', 'midfield'],
+              ['DEF', 'defense'],
+            ].map(([label, key]) => {
+              const home = Math.round(battle.result.ratings.home[key]);
+              const away = Math.round(battle.result.ratings.away[key]);
+              const total = Math.max(1, home + away);
+              return (
+                <div key={key} className="tape-row">
+                  <strong className={home >= away ? 'lead' : undefined}>{home}</strong>
+                  <div className="tape-bar">
+                    <span className="tape-home" style={{ width: `${(home / total) * 100}%` }} />
+                    <span className="tape-label">{label}</span>
+                    <span className="tape-away" style={{ width: `${(away / total) * 100}%` }} />
+                  </div>
+                  <strong className={away > home ? 'lead' : undefined}>{away}</strong>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="glass-panel battle-log" role="log" ref={logRef}>
             {visibleLog.map((entry, i) => (
               <motion.div

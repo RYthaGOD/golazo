@@ -35,10 +35,24 @@ const FLAGS = {
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, Math.round(v)));
 
-// "Surname, Given" → "Given Surname"; leave single-token names as-is.
+// Nobiliary/patronymic particles kept attached to the surname they precede.
+const PARTICLES = new Set([
+  'de', 'del', 'della', 'van', 'von', 'der', 'den', 'dos', 'das', 'da', 'di',
+  'du', 'la', 'le', 'el', 'al', 'bin', 'ben', 'mac', 'mc', 'ter', 'ten',
+]);
+
+// The feed stores full legal names as "Surname(s), Given(s)". Football uses
+// the everyday form: first given name + first (particle-aware) surname —
+// "Mbappe Lottin, Kylian" → "Kylian Mbappe", "Paul, Rodrigo De" stays "De Paul".
+// Single-token entries are already nicknames (Pedri, Gimenez) — leave them.
+const firstSurname = (surname) => {
+  const t = surname.split(/\s+/);
+  return t.length >= 2 && PARTICLES.has(t[0].toLowerCase()) ? `${t[0]} ${t[1]}` : t[0];
+};
 const formatName = (raw) => {
   const [surname, given] = raw.split(',').map((s) => s.trim());
-  return given ? `${given} ${surname}` : surname;
+  if (!given) return surname;
+  return `${given.split(/\s+/)[0]} ${firstSurname(surname)}`;
 };
 
 // ── Ingest snapshots ────────────────────────────────────────

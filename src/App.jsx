@@ -33,7 +33,7 @@ function App() {
   const packsApi = usePacks(edition);
   const balanceApi = useBalance();
   const ownedIds = useMemo(() => new Set(packsApi.collection.map(({ card }) => card.id)), [packsApi.collection]);
-  const squadApi = useSquad(ownedIds, edition.id);
+  const squadApi = useSquad(ownedIds, edition);
 
   if (!connected) {
     return <SolanaLogin />;
