@@ -10,7 +10,11 @@
     "preview": "vite preview",
     "lint": "oxlint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "gen:prompts": "node scripts/gen-card-prompts.mjs",
+    "gen:art": "node scripts/gen-card-art.mjs --priority-only",
+    "gen:art:all": "node scripts/gen-card-art.mjs",
+    "gen:art:manifest": "node scripts/gen-card-art-manifest.mjs"
   },
   "dependencies": {
     "@solana/wallet-adapter-base": "^0.9.27",
