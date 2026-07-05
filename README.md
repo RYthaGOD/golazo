@@ -160,6 +160,23 @@ in `.env` / [.env.example](.env.example), and the `ARG` default in the
 node scripts/gen-wc26.mjs        # writes src/game/players2026.js
 ```
 
+### Player card art (free, no API key)
+
+Each card can have its own generated anime art (public/cards/players/<id>).
+Cards without an image fall back to the position archetype.
+
+```bash
+node scripts/gen-card-prompts.mjs        # 1. write card-prompts.jsonl (one prompt/card)
+python3 scripts/gen_card_art.py          # 2. generate via Pollinations (free; --priority-only for legends/elites)
+node scripts/gen-card-art-manifest.mjs   # 3. update the manifest, then rebuild/redeploy
+```
+
+`gen_card_art.py` is resume-safe (existing files are skipped) and stdlib-only.
+`node scripts/gen-card-art.mjs` does the same from Node (`--provider=google`
+for a paid Imagen/Gemini key instead of the free default). The free tier is
+rate-limited (~1 image / 35s), so a full 696-card run grinds for a few hours —
+re-run any time to continue where it left off.
+
 ## Hosting
 
 Two Railway services:
