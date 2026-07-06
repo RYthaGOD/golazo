@@ -74,7 +74,7 @@ function App() {
           )}
           <WalletDisconnectButton
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
               border: '1px solid var(--border-subtle)',
               borderRadius: '10px',
               fontFamily: 'var(--font-display)',

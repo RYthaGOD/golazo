@@ -58,14 +58,15 @@ export default function SolanaLogin() {
             fontFamily: 'var(--font-display)',
             textTransform: 'uppercase',
             letterSpacing: '1px',
-            color: '#fff',
-            boxShadow: '0 8px 22px rgba(21, 128, 61, 0.32)'
+            color: '#05130b',
+            fontWeight: 700,
+            boxShadow: '0 8px 26px rgba(34, 197, 94, 0.4)'
           }} />
         </div>
       </div>
 
       <div style={{ position: 'absolute', bottom: '40px', color: 'var(--text-muted)', fontSize: '12px', fontFamily: 'var(--font-display)', letterSpacing: '1px' }}>
-        POWERED BY SOLANA · WC22 EDITION
+        POWERED BY SOLANA · WORLD CUP 2026 &amp; 2022
       </div>
     </div>
   );
