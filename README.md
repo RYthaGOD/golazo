@@ -44,6 +44,11 @@ collection and squads), switchable in the header:
 - **Match center** — the LIVE tab shows World Cup 2026 fixtures (teams,
   scores, match clocks) read from the TxODDS TxLINE feed — the app's sole
   source of match data.
+- **Wager** — PvP staked battles. Two players stake equal devnet SOL into a
+  match; the [wager program](programs/wager/src/lib.rs) rolls the winner
+  on-chain (weighted by squad power) and pays the whole pot to the victor. The
+  browser can't be trusted to resolve a wager, so the money outcome is the
+  on-chain roll and the 5v5 replay is seeded to agree with it.
 
 The card artwork is original anime-style illustration (one archetype per
 position) — no player likenesses are used; only factual names and statistics
@@ -72,6 +77,7 @@ The header shows which mode is active.
 | Data service (TxODDS proxy) | https://golazo-data-production.up.railway.app/api/health |
 | WC2022 program | [`GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL`](https://explorer.solana.com/address/GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL?cluster=devnet) |
 | WC2026 program | [`AY43PC3k3g1s8hBxZamVWubw35XDBBCHZBEg5ZeuLsJ2`](https://explorer.solana.com/address/AY43PC3k3g1s8hBxZamVWubw35XDBBCHZBEg5ZeuLsJ2?cluster=devnet) |
+| Wager program | [`6qcrzBMCSNLeQK9y6xsMYEeNYMsKYbLmqbnNpkRZaogH`](https://explorer.solana.com/address/6qcrzBMCSNLeQK9y6xsMYEeNYMsKYbLmqbnNpkRZaogH?cluster=devnet) |
 | Cluster | devnet (upgradeable) |
 | Pack price | 0.05 SOL (each edition) |
 
