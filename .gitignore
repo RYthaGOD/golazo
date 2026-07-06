@@ -41,6 +41,9 @@ coverage
 # Generated image-prompt list (regenerate with scripts/gen-card-prompts.mjs)
 card-prompts.jsonl
 
+# Throwaway scratch scripts
+scripts/*.tmp.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

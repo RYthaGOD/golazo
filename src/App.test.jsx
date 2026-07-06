@@ -35,6 +35,8 @@ vi.mock('./config.js', () => ({
   HAS_PACK_PROGRAM: false,
   DATA_API_URL: '',
   HAS_DATA_API: false,
+  WAGER_PROGRAM_ID: '',
+  HAS_WAGER: false,
 }));
 
 // framer-motion's rAF loops run away under jsdom (heap exhaustion) — render

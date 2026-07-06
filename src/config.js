@@ -28,3 +28,9 @@ export const DATA_API_URL = (import.meta.env.VITE_DATA_API_URL || '').trim().rep
 
 /** True when the TxODDS match center is available. */
 export const HAS_DATA_API = DATA_API_URL.length > 0;
+
+/** Deployed wager program id (PvP staked battles). Empty => Wager tab hidden. */
+export const WAGER_PROGRAM_ID = (import.meta.env.VITE_WAGER_PROGRAM_ID || '').trim();
+
+/** True when PvP staked battles are available. */
+export const HAS_WAGER = WAGER_PROGRAM_ID.length > 0;

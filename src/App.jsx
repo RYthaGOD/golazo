@@ -1,19 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletDisconnectButton } from '@solana/wallet-adapter-react-ui';
-import { Package, Users, Shield, Swords, Radio } from 'lucide-react';
+import { Package, Users, Shield, Swords, Radio, Coins } from 'lucide-react';
 import SolanaLogin from './components/SolanaLogin.jsx';
 import PackShop from './components/PackShop.jsx';
 import CollectionGrid from './components/CollectionGrid.jsx';
 import SquadBuilder from './components/SquadBuilder.jsx';
 import BattleArena from './components/BattleArena.jsx';
 import LiveScores from './components/LiveScores.jsx';
+import WagerArena from './components/WagerArena.jsx';
 import EditionSwitcher from './components/EditionSwitcher.jsx';
 import { usePacks } from './solana/usePacks.js';
 import { useBalance } from './solana/useBalance.js';
 import { useSquad } from './game/useSquad.js';
 import { getEdition, DEFAULT_EDITION_ID } from './game/editions.js';
-import { SOLANA_CLUSTER, HAS_DATA_API } from './config.js';
+import { SOLANA_CLUSTER, HAS_DATA_API, HAS_WAGER } from './config.js';
 import './index.css';
 
 const TABS = [
@@ -21,6 +22,7 @@ const TABS = [
   { id: 'club', label: 'CLUB', icon: Users },
   { id: 'squad', label: 'SQUAD', icon: Shield },
   { id: 'arena', label: 'ARENA', icon: Swords },
+  ...(HAS_WAGER ? [{ id: 'wager', label: 'WAGER', icon: Coins }] : []),
   ...(HAS_DATA_API ? [{ id: 'live', label: 'LIVE', icon: Radio }] : []),
 ];
 
@@ -108,6 +110,7 @@ function App() {
         {tab === 'club' && <CollectionGrid collection={packsApi.collection} edition={edition} />}
         {tab === 'squad' && <SquadBuilder collection={packsApi.collection} squadApi={squadApi} />}
         {tab === 'arena' && <BattleArena squadApi={squadApi} edition={edition} />}
+        {tab === 'wager' && <WagerArena squadApi={squadApi} />}
         {tab === 'live' && <LiveScores />}
       </main>
     </div>

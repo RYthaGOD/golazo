@@ -39,3 +39,9 @@ export const EDITIONS = RAW.map((e) => ({
 export const DEFAULT_EDITION_ID = EDITIONS[0].id;
 
 export const getEdition = (id) => EDITIONS.find((e) => e.id === id) ?? EDITIONS[0];
+
+// Global card lookup across every edition — a wager stores card ids only, so
+// replaying a match needs to resolve ids from whichever edition they belong to.
+const CARD_BY_ID = new Map(EDITIONS.flatMap((e) => e.players.map((p) => [p.id, p])));
+export const getCard = (id) => CARD_BY_ID.get(id);
+export const resolveSquad = (ids) => ids.map(getCard).filter(Boolean);

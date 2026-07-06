@@ -7,9 +7,11 @@ skip-lint = false
 
 [programs.localnet]
 golazo = "GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL"
+wager = "6qcrzBMCSNLeQK9y6xsMYEeNYMsKYbLmqbnNpkRZaogH"
 
 [programs.devnet]
 golazo = "GZUkNP4HhCdqZfZdQFhruArdz5oQ4Y8mgiS9wNPWc1ZL"
+wager = "6qcrzBMCSNLeQK9y6xsMYEeNYMsKYbLmqbnNpkRZaogH"
 
 [registry]
 url = "https://api.apr.dev"
