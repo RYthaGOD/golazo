@@ -54,3 +54,4 @@ scripts/*.tmp.*
 *.njsproj
 *.sln
 *.sw?
+demo-video/

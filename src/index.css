@@ -264,17 +264,18 @@ button:disabled {
 /* Login screen extras */
 .login-art {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .login-art img {
-  width: 76px;
-  height: 100px;
+  width: 72px;
+  height: 96px;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center 22%;
   border-radius: 10px;
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: var(--shadow-soft), 0 0 16px rgba(251, 191, 36, 0.15);
 }
 .login-steps {
   text-align: left;

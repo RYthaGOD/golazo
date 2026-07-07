@@ -173,5 +173,13 @@ http
   })
   .listen(PORT, () => {
     console.log(`golazo data service on :${PORT} (txline ${CONFIGURED ? 'configured' : 'NOT configured'})`);
-    if (CONFIGURED) discover().catch((e) => console.error('[txline] discovery failed:', e.message));
+    // Warm the cache on boot (discover + build the rows) so the first client
+    // request to /api/live is served from cache instead of fetching ~50
+    // snapshots synchronously.
+    if (CONFIGURED) {
+      discover()
+        .then(() => liveRows())
+        .then((rows) => console.log(`[txline] warm cache ready: ${rows.length} rows`))
+        .catch((e) => console.error('[txline] warm-up failed:', e.message));
+    }
   });

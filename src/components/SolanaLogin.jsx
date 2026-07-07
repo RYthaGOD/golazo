@@ -38,10 +38,15 @@ export default function SolanaLogin() {
         </p>
 
         <div className="login-art" aria-hidden="true">
-          <img src="/cards/gk.webp" alt="" loading="lazy" />
-          <img src="/cards/def.webp" alt="" loading="lazy" />
-          <img src="/cards/mid.webp" alt="" loading="lazy" />
-          <img src="/cards/fwd.webp" alt="" loading="lazy" />
+          {[
+            'wc26-10040792.jpg',
+            'wc26-49673.png',
+            'wc26-889209.jpg',
+            'wc26-463984.jpg',
+            'wc26-453928.jpg',
+          ].map((f) => (
+            <img key={f} src={`/cards/players/${f}`} alt="" loading="lazy" />
+          ))}
         </div>
 
         <ol className="login-steps">
