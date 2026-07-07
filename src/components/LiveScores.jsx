@@ -8,9 +8,10 @@ const kickoff = (ts) =>
   new Date(ts).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
 /**
- * World Cup match center. All data comes from TxODDS TxLINE via the Golazo
- * data service — scores, teams, and match clocks are read from the same
- * wallet-gated feed, nothing else.
+ * World Cup results, straight from the TxODDS TxLINE feed via the Golazo data
+ * service — the same wallet-gated data the WC26 cards are rated from. The
+ * dev-tier feed exposes the 2026 group stage (all played), so rows show as FT;
+ * a fixture inside its play window would badge LIVE automatically.
  */
 export default function LiveScores() {
   const [rows, setRows] = useState(null); // null = loading
@@ -43,7 +44,7 @@ export default function LiveScores() {
     <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
         <h2 className="text-gradient section-title">
-          <Radio size={18} /> WORLD CUP MATCH CENTER
+          <Radio size={18} /> WORLD CUP 2026 · GROUP STAGE
         </h2>
         <span className="pill">DATA: TXODDS TXLINE</span>
       </div>
@@ -61,7 +62,7 @@ export default function LiveScores() {
       )}
 
       {rows?.length === 0 && (
-        <p style={{ color: 'var(--text-muted)' }}>No covered fixtures right now — check back soon.</p>
+        <p style={{ color: 'var(--text-muted)' }}>No fixtures in the covered feed right now.</p>
       )}
 
       {rows?.length > 0 && (
@@ -83,7 +84,8 @@ export default function LiveScores() {
       )}
 
       <p style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-        Match data is served exclusively by TxODDS TxLINE (wallet-gated World Cup feed, ~60s delay).
+        Real World Cup 2026 results from the TxODDS TxLINE feed (wallet-gated) — the same data the
+        WC26 cards are rated from.
       </p>
     </div>
   );

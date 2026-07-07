@@ -23,7 +23,7 @@ const TABS = [
   { id: 'squad', label: 'SQUAD', icon: Shield },
   { id: 'arena', label: 'ARENA', icon: Swords },
   ...(HAS_WAGER ? [{ id: 'wager', label: 'WAGER', icon: Coins }] : []),
-  ...(HAS_DATA_API ? [{ id: 'live', label: 'LIVE', icon: Radio }] : []),
+  ...(HAS_DATA_API ? [{ id: 'live', label: 'SCORES', icon: Radio }] : []),
 ];
 
 function App() {
