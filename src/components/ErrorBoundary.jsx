@@ -39,26 +39,19 @@ export default class ErrorBoundary extends React.Component {
           gap: '20px',
           padding: '24px',
           textAlign: 'center',
-          backgroundColor: 'var(--bg-deep)',
-          color: 'var(--text-main)',
-          fontFamily: 'var(--font-sans)',
+          backgroundColor: 'var(--surface)',
+          color: 'var(--text)',
+          fontFamily: 'var(--font-body)',
         }}
       >
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-            color: 'var(--accent-dramatic)',
-          }}
-        >
+        <h1 className="hero-title" style={{ fontSize: 'clamp(32px, 5vw, 52px)' }}>
           Something went wrong
         </h1>
-        <p style={{ color: 'var(--text-muted)', maxWidth: '420px', lineHeight: 1.6 }}>
+        <p style={{ color: 'var(--muted)', maxWidth: '420px', lineHeight: 1.6 }}>
           The match feed hit an unexpected error. You can try to recover without
           losing your wallet connection.
         </p>
-        <button className="glow-border" onClick={this.handleReset} style={{ padding: '12px 24px' }}>
+        <button className="btn-primary" onClick={this.handleReset}>
           Try again
         </button>
         {import.meta.env.DEV && (
@@ -68,7 +61,8 @@ export default class ErrorBoundary extends React.Component {
               maxWidth: '90vw',
               overflow: 'auto',
               fontSize: '12px',
-              color: 'var(--text-muted)',
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--muted-2)',
               textAlign: 'left',
             }}
           >

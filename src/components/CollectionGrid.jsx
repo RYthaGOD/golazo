@@ -6,8 +6,9 @@ import { POSITIONS, RARITIES } from '../game/players.js';
 /**
  * The wallet's card collection with position/rarity filters.
  * When `onToggle` is provided (squad building) cards become selectable.
+ * Pass `title={null}` when the page headline already names this panel.
  */
-export default function CollectionGrid({ collection, selectedIds, onToggle, edition, title = 'MY CLUB' }) {
+export default function CollectionGrid({ collection, selectedIds, onToggle, edition, title = 'My club' }) {
   const totalCards = edition?.players.length ?? collection.length;
   const [posFilter, setPosFilter] = useState('ALL');
   const [rarityFilter, setRarityFilter] = useState('ALL');
@@ -19,14 +20,18 @@ export default function CollectionGrid({ collection, selectedIds, onToggle, edit
   );
 
   return (
-    <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-        <h2 className="text-gradient section-title">
-          <Users size={18} /> {title}
-        </h2>
-        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
-          {collection.length}/{totalCards} UNIQUE CARDS
-        </span>
+    <div className="panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="section-head">
+        {title ? (
+          <h2 className="section-title">
+            <Users size={18} /> {title}
+          </h2>
+        ) : (
+          <span className="eyebrow">
+            Showing {filtered.length} of {collection.length}
+          </span>
+        )}
+        <span className="pill pill-mono">{collection.length}/{totalCards} unique</span>
       </div>
 
       <div className="filter-row">
@@ -49,7 +54,7 @@ export default function CollectionGrid({ collection, selectedIds, onToggle, edit
       </div>
 
       {filtered.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)', padding: '24px 0', textAlign: 'center' }}>
+        <p className="empty-note">
           {collection.length === 0
             ? 'No cards yet — rip open your first pack in the shop.'
             : 'No cards match these filters.'}

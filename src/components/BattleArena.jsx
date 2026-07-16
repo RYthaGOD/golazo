@@ -67,11 +67,9 @@ export default function BattleArena({ squadApi, edition }) {
 
   if (!isLegal) {
     return (
-      <div className="glass-panel" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-        <Swords size={28} style={{ opacity: 0.6 }} />
-        <p style={{ marginTop: 12, fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
-          FIELD A LEGAL SQUAD FIRST — 5 CARDS: 1 GK, 1+ DEF, 1+ FWD.
-        </p>
+      <div className="panel arena-empty">
+        <Swords size={26} />
+        <p>Field a legal squad first — five cards: 1 keeper, 1+ defender, 1+ forward.</p>
       </div>
     );
   }
@@ -83,42 +81,30 @@ export default function BattleArena({ squadApi, edition }) {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h2 className="text-gradient section-title">
-            <Swords size={18} /> BATTLE ARENA
-          </h2>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
-            RECORD: {record.w}W – {record.l}L
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {Object.entries(AI_TIERS).map(([key, { label }]) => (
-            <button key={key} className={tier === key ? 'chip active' : 'chip'} onClick={() => setTier(key)} disabled={battle && !done}>
-              {label.toUpperCase()}
-            </button>
-          ))}
-          <button
-            className="glow-border"
-            style={{ padding: '10px 24px', marginLeft: 'auto' }}
-            onClick={fight}
-            disabled={battle && !done}
-          >
-            {battle && !done ? 'MATCH IN PLAY…' : battle ? 'REMATCH' : 'KICK OFF'}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="panel" style={{ padding: 20, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span className="eyebrow" style={{ marginRight: 4 }}>Opponent</span>
+        {Object.entries(AI_TIERS).map(([key, { label }]) => (
+          <button key={key} className={tier === key ? 'chip active' : 'chip'} onClick={() => setTier(key)} disabled={battle && !done}>
+            {label}
           </button>
-        </div>
+        ))}
+        <span className="pill pill-mono" style={{ marginLeft: 'auto' }}>
+          Record {record.w}W–{record.l}L
+        </span>
+        <button className="btn-primary" onClick={fight} disabled={battle && !done}>
+          {battle && !done ? 'Match in play…' : battle ? 'Rematch' : 'Kick off'}
+        </button>
       </div>
 
       {battle && (
         <>
-          <div className="glass-panel scoreboard">
-            <span className="score-team">YOUR FIVE</span>
+          <div className="panel scoreboard">
+            <span className="score-team">Your five</span>
             <span className="score-num">
-              {score.home} – {score.away}
+              {score.home}–{score.away}
             </span>
-            <span className="score-team">{battle.tierLabel.toUpperCase()}</span>
+            <span className="score-team">{battle.tierLabel}</span>
             {!done && (
               <button className="icon-button" onClick={() => setRevealed(fullLog.length)} title="Skip to full time" aria-label="Skip to full time">
                 <FastForward size={16} />
@@ -126,7 +112,7 @@ export default function BattleArena({ squadApi, edition }) {
             )}
           </div>
 
-          <div className="glass-panel tape" aria-label="Tale of the tape">
+          <div className="panel tape" aria-label="Tale of the tape">
             {[
               ['ATT', 'attack'],
               ['MID', 'midfield'],
@@ -149,7 +135,7 @@ export default function BattleArena({ squadApi, edition }) {
             })}
           </div>
 
-          <div className="glass-panel battle-log" role="log" ref={logRef}>
+          <div className="panel battle-log" role="log" ref={logRef}>
             {visibleLog.map((entry, i) => (
               <motion.div
                 key={i}
@@ -163,16 +149,14 @@ export default function BattleArena({ squadApi, edition }) {
             ))}
             {done && (
               <div className={`battle-result ${battle.result.winner === 'home' ? 'won' : 'lost'}`}>
-                <Trophy size={18} />
-                {battle.result.winner === 'home' ? 'VICTORY!' : 'DEFEAT.'} MVP: {battle.result.mvp.name}
+                <Trophy size={17} />
+                {battle.result.winner === 'home' ? 'Victory' : 'Defeat'} · MVP {battle.result.mvp.name}
               </div>
             )}
           </div>
 
-          <div className="glass-panel" style={{ padding: 24 }}>
-            <h3 className="section-title" style={{ color: 'var(--text-muted)' }}>
-              OPPONENT: {battle.tierLabel.toUpperCase()}
-            </h3>
+          <div className="panel" style={{ padding: 24 }}>
+            <span className="eyebrow">Opponent · {battle.tierLabel}</span>
             <div className="card-grid squad-grid" style={{ marginTop: 12 }}>
               {battle.aiSquad.map((card) => (
                 <PlayerCard key={card.id} card={card} compact />

@@ -99,34 +99,44 @@ beforeEach(() => {
 // deterministic openPack() default pools.
 const selectWC22 = (user) => user.click(screen.getByRole('button', { name: /^WC22$/ }));
 
+// Copy is authored in sentence case and uppercased by CSS, so assertions match
+// the DOM text, not what the screen renders.
+const awaitShop = () => screen.findByText('Pack shop.');
+
+// The header stat rail pairs a label with its value; read the value back.
+const statValue = (label) =>
+  screen.getByText(label).closest('.stat').querySelector('.stat-value').textContent;
+
 describe('Golazo game loop', () => {
   it('shows the shop with pre-seeded packs counted', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await screen.findByText('PACK SHOP');
+    await awaitShop();
     await selectWC22(user);
-    expect(await screen.findByText(`PACKS IN YOUR CLUB: ${SEEDS.length}`)).toBeInTheDocument();
+    await screen.findByText('Pack shop.');
+    expect(statValue('Packs')).toBe(String(SEEDS.length));
   });
 
   it('opens a free pack and adds it to the club', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await screen.findByText('PACK SHOP');
+    await awaitShop();
     await selectWC22(user);
     await user.click(await screen.findByRole('button', { name: /OPEN FREE PACK/i }));
-    expect(await screen.findByText('PACK RIPPED OPEN')).toBeInTheDocument();
+    expect(await screen.findByText('Pack ripped open')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /ADD TO MY CLUB/i }));
-    expect(await screen.findByText(`PACKS IN YOUR CLUB: ${SEEDS.length + 1}`)).toBeInTheDocument();
+    await screen.findByText('Pack shop.');
+    expect(statValue('Packs')).toBe(String(SEEDS.length + 1));
   });
 
   it('shows the owned collection in the club tab', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await screen.findByText('PACK SHOP');
+    await awaitShop();
     await selectWC22(user);
     await user.click(screen.getByRole('button', { name: /^CLUB$/i }));
     const owned = ownedCards();
-    expect(await screen.findByText(new RegExp(`^${owned.length}/\\d+ UNIQUE CARDS$`))).toBeInTheDocument();
+    expect(await screen.findByText(new RegExp(`^${owned.length}/\\d+ unique$`))).toBeInTheDocument();
     // Spot-check one owned card is on screen
     expect(screen.getAllByText(owned[0].name).length).toBeGreaterThan(0);
   });
@@ -134,7 +144,7 @@ describe('Golazo game loop', () => {
   it('builds a legal squad and wins or loses a full arena battle', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await screen.findByText('PACK SHOP');
+    await awaitShop();
     await selectWC22(user);
 
     // Arena refuses play without a legal squad
@@ -145,8 +155,8 @@ describe('Golazo game loop', () => {
     await user.click(screen.getByRole('button', { name: /^SQUAD$/i }));
     const squad = pickSquad(ownedCards());
     expect(squad.every(Boolean)).toBe(true);
-    const pickerTitle = await screen.findByText('PICK FROM YOUR CLUB');
-    const picker = pickerTitle.closest('.glass-panel');
+    const pickerTitle = await screen.findByText('Pick from your club');
+    const picker = pickerTitle.closest('.panel');
     for (const card of squad) {
       await user.click(within(picker).getByText(card.name).closest('button'));
     }
@@ -156,8 +166,8 @@ describe('Golazo game loop', () => {
     await user.click(screen.getByRole('button', { name: /^ARENA$/i }));
     await user.click(await screen.findByRole('button', { name: /KICK OFF/i }));
     await user.click(await screen.findByRole('button', { name: /skip to full time/i }));
-    expect(await screen.findByText(/VICTORY!|DEFEAT\./)).toBeInTheDocument();
-    expect(screen.getByText(/RECORD: (1W – 0L|0W – 1L)/)).toBeInTheDocument();
+    expect(await screen.findByText(/^(Victory|Defeat) · MVP /)).toBeInTheDocument();
+    expect(screen.getByText(/^Record (1W–0L|0W–1L)$/)).toBeInTheDocument();
 
     // The battle wrote the record to this wallet's edition-scoped storage
     const record = JSON.parse(localStorage.getItem(`golazo:record:wc22:${TEST_PUBKEY}`));
@@ -169,11 +179,12 @@ describe('Golazo game loop', () => {
     localStorage.setItem(`golazo:squad:wc22:${TEST_PUBKEY}`, JSON.stringify(squad.map((c) => c.id)));
     const user = userEvent.setup();
     render(<App />);
-    await screen.findByText('PACK SHOP');
+    await awaitShop();
     await selectWC22(user);
     // The tab's accessible name includes the "squad ready" dot's aria-label.
     await user.click(screen.getByRole('button', { name: /^SQUAD\b/i }));
     expect(await screen.findByText(/SQUAD READY/i)).toBeInTheDocument();
-    expect(screen.getByText(`STARTING FIVE (5/5)`)).toBeInTheDocument();
+    expect(screen.getByText('Starting five.')).toBeInTheDocument();
+    expect(screen.getByText('5 of 5 picked')).toBeInTheDocument();
   });
 });

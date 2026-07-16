@@ -44,29 +44,29 @@ function ResultView({ match, me, onClose }) {
 
   if (!view) {
     return (
-      <div className="glass-panel" style={{ padding: 20 }}>
-        <p style={{ color: 'var(--text-muted)' }}>This match used cards from an edition not loaded here.</p>
-        <button style={{ marginTop: 12 }} onClick={onClose}>CLOSE</button>
+      <div className="panel" style={{ padding: 20 }}>
+        <p style={{ color: 'var(--muted-2)' }}>This match used cards from an edition not loaded here.</p>
+        <button style={{ marginTop: 12 }} onClick={onClose}>Close</button>
       </div>
     );
   }
 
   const { r, iWon } = view;
-  const payout = iWon ? `+${sol(match.stake * 2 - match.stake)} SOL` : `-${sol(match.stake)} SOL`;
+  const payout = iWon ? `+◎ ${sol(match.stake)}` : `−◎ ${sol(match.stake)}`;
   return (
-    <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 className="section-title">
-          <Trophy size={16} /> MATCH RESULT
+    <div className="panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div className="section-head">
+        <h3 className="section-title" style={{ fontSize: 17 }}>
+          <Trophy size={16} /> Match result
         </h3>
         <button className="icon-button" onClick={onClose} aria-label="Close">
           <X size={16} />
         </button>
       </div>
       <div className="scoreboard" style={{ padding: '8px 0' }}>
-        <span className="score-team">YOUR FIVE</span>
-        <span className="score-num">{r.homeScore} – {r.awayScore}</span>
-        <span className="score-team">RIVAL</span>
+        <span className="score-team">Your five</span>
+        <span className="score-num">{r.homeScore}–{r.awayScore}</span>
+        <span className="score-team">Rival</span>
       </div>
       <div className="tape">
         {[['ATT', 'attack'], ['MID', 'midfield'], ['DEF', 'defense']].map(([label, key]) => {
@@ -87,10 +87,10 @@ function ResultView({ match, me, onClose }) {
         })}
       </div>
       <div className={`battle-result ${iWon ? 'won' : 'lost'}`}>
-        <Trophy size={18} />
-        {iWon ? 'YOU WON THE POT' : 'RIVAL TOOK THE POT'} · {payout}
+        <Trophy size={17} />
+        {iWon ? 'You won the pot' : 'Rival took the pot'} · {payout}
       </div>
-      {r.wentToPens && <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>Settled on penalties.</p>}
+      {r.wentToPens && <p className="empty-note" style={{ padding: 0, fontSize: 12 }}>Settled on penalties.</p>}
     </div>
   );
 }
@@ -106,11 +106,9 @@ export default function WagerArena({ squadApi }) {
 
   if (!isLegal) {
     return (
-      <div className="glass-panel" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-        <Coins size={26} style={{ opacity: 0.6 }} />
-        <p style={{ marginTop: 12, fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
-          BUILD A LEGAL SQUAD IN THE SQUAD TAB TO STAKE A WAGER.
-        </p>
+      <div className="panel arena-empty">
+        <Coins size={26} />
+        <p>Build a legal squad in the squad tab to stake a wager.</p>
       </div>
     );
   }
@@ -125,74 +123,73 @@ export default function WagerArena({ squadApi }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {result && <ResultView match={result} me={me} onClose={() => setResult(null)} />}
 
       {/* Create a challenge */}
-      <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h2 className="text-gradient section-title">
-            <Coins size={18} /> WAGER ARENA
-          </h2>
-          <span className="pill">YOUR SQUAD POWER: {squadPower(squad)}</span>
+      <div className="panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="section-head">
+          <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.65, maxWidth: '62ch' }}>
+            Stake devnet SOL and open a challenge. When a rival accepts, the program rolls the winner{' '}
+            <strong style={{ color: 'var(--pitch-bright)' }}>on-chain</strong> — weighted by squad power — and
+            pays the whole pot to the victor.
+          </p>
+          <span className="pill pill-mono">Squad power {squadPower(squad)}</span>
         </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.6 }}>
-          Stake devnet SOL and open a challenge. When a rival accepts, the program rolls the winner{' '}
-          <strong>on-chain</strong> (weighted by squad power) and pays the whole pot to the victor.
-        </p>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span className="eyebrow" style={{ marginRight: 4 }}>Stake</span>
           {STAKES.map((s) => (
             <button key={s} className={stake === s ? 'chip active' : 'chip'} onClick={() => setStake(s)}>
-              {s} SOL
+              ◎ {s}
             </button>
           ))}
           <button
-            className="glow-border"
-            style={{ padding: '12px 26px', marginLeft: 'auto' }}
+            className="btn-primary"
+            style={{ marginLeft: 'auto' }}
             onClick={() => wager.create(stake)}
             disabled={wager.busy}
           >
-            {wager.busy ? 'CONFIRMING…' : `STAKE ${stake} SOL`}
+            {wager.busy ? 'Confirming…' : `Stake ◎ ${stake}`}
           </button>
         </div>
         {wager.error && <div role="alert" className="error-note">{wager.error}</div>}
       </div>
 
       {/* Open challenges */}
-      <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 className="section-title" style={{ fontSize: 15 }}>
-            <Swords size={16} /> OPEN CHALLENGES
+      <div className="panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="section-head">
+          <h3 className="section-title" style={{ fontSize: 17 }}>
+            <Swords size={16} /> Open challenges
           </h3>
           <button className="chip" onClick={wager.refresh} disabled={wager.loading}>
-            {wager.loading ? <Loader size={12} className="spin" /> : 'REFRESH'}
+            {wager.loading ? <Loader size={12} className="spin" /> : 'Refresh'}
           </button>
         </div>
 
         {openFromOthers.length === 0 && myOpen.length === 0 && (
-          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>
+          <p className="empty-note">
             No open challenges. Create one above and share the arena — first to accept plays for the pot.
           </p>
         )}
 
         {myOpen.map((m) => (
           <div key={m.pubkey} className="wager-row mine">
-            <span className="wager-tag">YOURS · WAITING</span>
-            <span>{sol(m.stake)} SOL</span>
+            <span className="wager-tag"><span className="dot gold" /> Yours · waiting</span>
+            <span className="wager-sol">◎ {sol(m.stake)}</span>
             <span className="wager-pow">PWR {m.creatorPower}</span>
             <button className="chip" onClick={() => wager.cancel(m)} disabled={wager.busy}>
-              CANCEL
+              Cancel
             </button>
           </div>
         ))}
 
         {openFromOthers.map((m) => (
           <div key={m.pubkey} className="wager-row">
-            <span>{short(m.creator)}</span>
-            <span>{sol(m.stake)} SOL</span>
+            <span className="mono" style={{ color: 'var(--muted)' }}>{short(m.creator)}</span>
+            <span className="wager-sol">◎ {sol(m.stake)}</span>
             <span className="wager-pow">PWR {m.creatorPower}</span>
-            <button className="glow-border" style={{ padding: '8px 18px' }} onClick={() => doJoin(m)} disabled={wager.busy}>
-              {wager.busy ? '…' : 'ACCEPT'}
+            <button className="btn-primary" style={{ padding: '9px 18px' }} onClick={() => doJoin(m)} disabled={wager.busy}>
+              {wager.busy ? '…' : 'Accept'}
             </button>
           </div>
         ))}
@@ -200,9 +197,9 @@ export default function WagerArena({ squadApi }) {
 
       {/* Recent results */}
       {resolved.length > 0 && (
-        <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <h3 className="section-title" style={{ fontSize: 15 }}>
-            <Trophy size={16} /> YOUR RESULTS
+        <div className="panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <h3 className="section-title" style={{ fontSize: 17, marginBottom: 4 }}>
+            <Trophy size={16} /> Your results
           </h3>
           {resolved.slice(0, 8).map((m) => {
             const iWon = m.winner === me;
@@ -214,10 +211,14 @@ export default function WagerArena({ squadApi }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                <span>{iWon ? 'WON' : 'LOST'}</span>
-                <span>vs {short(m.creator === me ? m.opponent : m.creator)}</span>
-                <span className="wager-pow">POT {sol(m.stake * 2)} SOL</span>
-                <span>{iWon ? `+${sol(m.stake)}` : `-${sol(m.stake)}`} SOL</span>
+                <span className={`wager-outcome ${iWon ? 'won' : 'lost'}`}>{iWon ? 'Won' : 'Lost'}</span>
+                <span style={{ color: 'var(--muted-2)' }}>
+                  vs <span className="mono">{short(m.creator === me ? m.opponent : m.creator)}</span>
+                </span>
+                <span className="wager-pow">POT ◎ {sol(m.stake * 2)}</span>
+                <span className="wager-sol" style={{ color: iWon ? 'var(--pitch-bright)' : '#ffb4ab' }}>
+                  {iWon ? `+◎ ${sol(m.stake)}` : `−◎ ${sol(m.stake)}`}
+                </span>
               </motion.button>
             );
           })}

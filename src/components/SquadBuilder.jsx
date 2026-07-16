@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import PlayerCard from './PlayerCard.jsx';
 import CollectionGrid from './CollectionGrid.jsx';
 import { teamRatings, SQUAD_SIZE } from '../game/battle.js';
@@ -20,15 +20,15 @@ export default function SquadBuilder({ collection, squadApi }) {
   const ratings = squad.length > 0 ? teamRatings(squad) : null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <div className="glass-panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <h2 className="text-gradient section-title">
-            <Shield size={18} /> STARTING FIVE ({squad.length}/{SQUAD_SIZE})
-          </h2>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="panel" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div className="section-head">
+          <span className="eyebrow">
+            {squad.length} of {SQUAD_SIZE} picked
+          </span>
           {squad.length > 0 && (
             <button className="chip" onClick={clear}>
-              <X size={12} /> CLEAR
+              <X size={12} /> Clear
             </button>
           )}
         </div>
@@ -39,20 +39,18 @@ export default function SquadBuilder({ collection, squadApi }) {
           ))}
           {Array.from({ length: SQUAD_SIZE - squad.length }).map((_, i) => (
             <div key={`empty-${i}`} className="squad-slot-empty">
-              EMPTY
-              <br />
-              SLOT
+              Empty slot
             </div>
           ))}
         </div>
 
         {isLegal ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
             <RatingBar label="ATTACK" value={ratings.attack} />
             <RatingBar label="MIDFIELD" value={ratings.midfield} />
             <RatingBar label="DEFENSE" value={ratings.defense} />
-            <span style={{ fontSize: 12, color: 'var(--accent-current)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
-              ✓ SQUAD READY — HEAD TO THE ARENA
+            <span className="squad-ready" style={{ marginTop: 4 }}>
+              <Check size={14} /> Squad ready — head to the arena
             </span>
           </div>
         ) : (
@@ -64,7 +62,7 @@ export default function SquadBuilder({ collection, squadApi }) {
         )}
       </div>
 
-      <CollectionGrid collection={collection} selectedIds={squadIds} onToggle={toggle} title="PICK FROM YOUR CLUB" />
+      <CollectionGrid collection={collection} selectedIds={squadIds} onToggle={toggle} title="Pick from your club" />
     </div>
   );
 }
