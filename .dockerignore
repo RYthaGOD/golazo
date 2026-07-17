@@ -5,6 +5,7 @@ target
 programs
 server
 tests
+demo-video
 .git
 .github
 .anchor
